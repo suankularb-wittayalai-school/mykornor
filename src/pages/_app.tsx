@@ -26,7 +26,8 @@ const App = ({ Component, pageProps }: AppProps) => {
       initial={false}
       onExitComplete={() => window.scrollTo(0, 0)}
     >
-      <div className="overflow-hidden bg-background">
+      {/* <div className="overflow-hidden bg-[url('/images/home/banner.webp')] bg-cover"> */}
+      <div className="overflow-hidden bg-teal-700">
         <PageLayout
           key={router.route}
           currentPath={router.asPath}
@@ -48,12 +49,12 @@ const App = ({ Component, pageProps }: AppProps) => {
               url: "/account/login",
             },
             {
-              name: t("navigation.about"),
+              name: t("navigation.test"),
               icon: {
                 inactive: <MaterialIcon icon="information" type="outlined" />,
                 active: <MaterialIcon icon="information" type="filled" />,
               },
-              url: "/about",
+              url: "/test",
             },
           ]}
           LinkElement={Link}

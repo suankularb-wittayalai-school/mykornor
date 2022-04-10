@@ -1,11 +1,11 @@
 {
   "brand": {
-    "name": "แม่แบบ NextJS",
+    "name": "mySupremeLeaders",
     "school": "โรงเรียนสวนกุหลาบวิทยาลัย"
   },
   "navigation": {
     "home": "หน้าหลัก",
     "login": "เข้าสู่ระบบ",
-    "about": "เกี่ยวกับ"
+    "test": "เทส"
   }
 }
