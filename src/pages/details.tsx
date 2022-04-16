@@ -5,10 +5,20 @@ import Head from "next/head";
 
 import { useTranslation } from "next-i18next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
+import React, { useState } from "react";
+
+import { Party, Person, Contact, ShortParty } from "@utils/types";
 
 // SK Components
 import {
-    Header,
+  Button,
+  Card,
+  CardHeader,
+  CardList,
+  Header,
+  ListLayout,
+  ListSection,
+  MainSection,
   MaterialIcon,
   RegularLayout,
   Section,
@@ -19,12 +29,92 @@ import {
 const Test: NextPage = () => {
   const { t } = useTranslation(["details", "common"]);
 
+  const parties: ShortParty[] = [
+    {
+      groupName: "Members",
+      content: [
+        {
+          id: 1,
+          content: { name: "Jimmy_Tembest", position: "Slime" },
+        },
+        {
+          id: 2,
+          content: { name: "Best_Tempest", position: "Slimes" },
+        },
+        {
+          id: 3,
+          content: { name: "Smart_Tempest", position: "Slimez" },
+        },
+      ],
+    },
+  ];
+
+  const party: Party = {
+    id: 1,
+    name: "Jimmy Party",
+    image: "",
+    member: [
+      {
+        id: 1,
+        name: "Jimmy",
+        description: "He is Jimmy",
+        position: "King",
+        achievements: ["Haircut", "Tempest"],
+        contacts: [
+          {
+            id: 1,
+            type: "Line",
+            name: "jimmy",
+            value: "jimmy123",
+          },
+          {
+            id: 2,
+            type: "Facebook",
+            name: "Jimmy_Tempest",
+            value: "JimmyT12345",
+          },
+        ],
+      },
+      {
+        id: 1,
+        name: "Dave",
+        description: "He is Dave",
+        position: "Picture",
+        achievements: ["still", "looking"],
+        contacts: [
+          {
+            id: 1,
+            type: "Line",
+            name: "Dave",
+            value: "Dave123",
+          },
+          {
+            id: 2,
+            type: "Facebook",
+            name: "Davezz",
+            value: "Dave12345",
+          },
+        ],
+      },
+    ],
+    policy: "I will fucking...",
+    description: "This is jimmy's club. Jimmy made this club",
+  };
+
+  const [content, setContent] = useState(party.member[0]);
+  const [policy, setPolicy] = useState(party.policy);
+  const [mainType, setMainType] = useState<"policy" | "member">("policy");
+
   return (
     <>
       <Head>
-        <title>{t("title", { ns: "details" })} - {t("brand.name", { ns: "common" })}</title>
+        <title>
+          {t("title", { ns: "details" })} - {t("brand.name", { ns: "common" })}
+        </title>
       </Head>
-      <RegularLayout  className="!bg-transparent"
+      <ListLayout
+        show={true}
+        className="!bg-transparent"
         Title={
           <Title
             name={{ title: t("title") }}
@@ -33,10 +123,117 @@ const Test: NextPage = () => {
           />
         }
       >
-        <Section>
-            <h1 className="!text-9xl text-neutral-50">TODO</h1>
-        </Section>
-      </RegularLayout>
+        <ListSection>
+          <Section className="!px-4">
+            <h1 className="pt-9 !text-3xl font-bold">{party.name}</h1>
+          </Section>
+          <CardList
+            // listGroups={party.map((details)=> ({
+            //   ...details,
+            //   groupName: details.groupName
+            // }))}
+            listGroups={[
+              {
+                groupName: "",
+                content: [
+                  {
+                    id: 0,
+                    content: { name: "นโยบาย" },
+                  },
+                ],
+              },
+            ].concat(parties)}
+            ListItem={({ content, className, onClick, id }) =>
+              content.name == "นโยบาย" ? (
+                <button
+                  className="w-full"
+                  onClick={() => {
+                    onClick();
+                    setPolicy(party.policy);
+                    setMainType("policy");
+                  }}
+                >
+                  <Card
+                    type="horizontal"
+                    className={className}
+                    appearance="tonal"
+                  >
+                    <CardHeader
+                      icon={<MaterialIcon icon="assignment" />}
+                      title={<h1>นโยบาย</h1>}
+                    />
+                  </Card>
+                </button>
+              ) : (
+                <button
+                  className="w-full"
+                  onClick={() => {
+                    onClick();
+                    setContent(party.member[id - 1]);
+                    setMainType("member");
+                  }}
+                >
+                  <Card
+                    type="horizontal"
+                    className={className}
+                    appearance="tonal"
+                  >
+                    <CardHeader title={content.name} label={content.position} />
+                  </Card>
+                </button>
+              )
+            }
+            onChange={() => {}}
+          />
+        </ListSection>
+        <MainSection>
+          {mainType == "policy" ? (
+            <>
+              <Section className="container-surface">
+                <h1 className="pt-4 text-3xl">เกี่ยวกับ</h1>
+                <p>{party.description}</p>
+              </Section>
+              <Section className="container-surface">
+                <h1 className="text-3xl">นโยบาย</h1>
+                <p>{party.policy}</p>
+              </Section>
+            </>
+          ) : (
+            mainType == "member" && (
+              <>
+                <Section className="container-surface">
+                  <h1 className="pt-4 text-3xl">เกี่ยวกับ</h1>
+                  <p>{content.description}</p>
+                </Section>
+                <Section className="container-surface">
+                  <h1 className="text-3xl">ผลงาน</h1>
+                  <ul className="layout-grid-cols-2">
+                    {content.achievements.map((achievements) =>
+                      <li>
+                        <Card type="horizontal">
+                          <CardHeader title={<p>{achievements}</p>} />
+                        </Card>
+                      </li>
+                    )}
+                  </ul>
+                </Section>
+                <Section className="container-surface">
+                  <h1 className="text-3xl">ติดต่อ</h1>
+                  <ul className="layout-grid-cols-2">
+                    {content.contacts.map((contact) =>
+                      <li>
+                        <Card type="horizontal">
+                          <CardHeader title={<p>{contact.name}</p>} />
+                        </Card>
+                      </li>
+                    )}
+                  </ul>
+                </Section>
+              </>
+            )
+          )}
+        </MainSection>
+      </ListLayout>
     </>
   );
 };

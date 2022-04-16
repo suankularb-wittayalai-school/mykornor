@@ -27,7 +27,7 @@ const App = ({ Component, pageProps }: AppProps) => {
       onExitComplete={() => window.scrollTo(0, 0)}
     >
       {/* <div className="overflow-hidden bg-[url('/images/home/banner.webp')] bg-cover"> */}
-      <div className="overflow-hidden bg-teal-700">
+      <div className="overflow-hidden bg-background">
         <PageLayout
           key={router.route}
           currentPath={router.asPath}

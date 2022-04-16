@@ -39,9 +39,10 @@ const Index: NextPage = () => {
       <Head>
         <title>{t("brand.name", { ns: "common" })}</title>
       </Head>
-      <RegularLayout className="!bg-transparent">
+      <RegularLayout className="!bg-[url('/images/home/landing.jpg')] bg-cover">
         <Section labelledBy="title">
-          <h1 className="!text-xl text-white text-center">
+          {/* <h1 className="!text-xl text-white text-center"> */}
+          <h1 className="!text-xl text-center">
             {t("title")}
           </h1>
         </Section>
