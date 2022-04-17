@@ -1,5 +1,5 @@
 // Modules
-import { NextPage } from "next";
+import { GetServerSideProps, NextPage } from "next";
 import Image from "next/image";
 import Head from "next/head";
 
@@ -8,6 +8,9 @@ import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import React, { useState } from "react";
 
 import { Party, Person, Contact, ShortParty } from "@utils/types";
+
+import { db } from "@utils/firebase-config";
+import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 
 // SK Components
 import {
@@ -26,8 +29,11 @@ import {
 } from "@suankularb-components/react";
 
 // Page
-const Test: NextPage = () => {
-  const { t } = useTranslation(["details", "common"]);
+const Test: NextPage<{ Parties: Party[]; shortParties: ShortParty }> = ({
+  Parties,
+  shortParties,
+}) => {
+  console.log(Parties, shortParties);
 
   const parties: ShortParty[] = [
     {
@@ -101,15 +107,15 @@ const Test: NextPage = () => {
     description: "This is jimmy's club. Jimmy made this club",
   };
 
-  const [content, setContent] = useState(party.member[0]);
-  const [policy, setPolicy] = useState(party.policy);
+  const [content, setContent] = useState(Parties[0].member[0]);
+  const [policy, setPolicy] = useState(Parties[0].policy);
   const [mainType, setMainType] = useState<"policy" | "member">("policy");
 
   return (
     <>
       <Head>
         <title>
-          {t("title", { ns: "details" })} - {t("brand.name", { ns: "common" })}
+          {/* {t("title", { ns: "details" })} - {t("brand.name", { ns: "common" })} */}
         </title>
       </Head>
       <ListLayout
@@ -117,7 +123,7 @@ const Test: NextPage = () => {
         className="!bg-transparent"
         Title={
           <Title
-            name={{ title: t("title") }}
+            name={{ title: "details"}}
             pageIcon={<MaterialIcon icon="home" />}
             backGoesTo="/"
           />
@@ -125,7 +131,7 @@ const Test: NextPage = () => {
       >
         <ListSection>
           <Section className="!px-4">
-            <h1 className="pt-9 !text-3xl font-bold">{party.name}</h1>
+            <h1 className="pt-9 !text-3xl font-bold">{Parties[0].name}</h1>
           </Section>
           <CardList
             // listGroups={party.map((details)=> ({
@@ -142,14 +148,14 @@ const Test: NextPage = () => {
                   },
                 ],
               },
-            ].concat(parties)}
+            ].concat(shortParties)}
             ListItem={({ content, className, onClick, id }) =>
               content.name == "นโยบาย" ? (
                 <button
                   className="w-full"
                   onClick={() => {
                     onClick();
-                    setPolicy(party.policy);
+                    setPolicy(Parties[0].policy);
                     setMainType("policy");
                   }}
                 >
@@ -169,7 +175,7 @@ const Test: NextPage = () => {
                   className="w-full"
                   onClick={() => {
                     onClick();
-                    setContent(party.member[id - 1]);
+                    setContent(Parties[0].member[id - 1]);
                     setMainType("member");
                   }}
                 >
@@ -208,25 +214,25 @@ const Test: NextPage = () => {
                 <Section className="container-surface">
                   <h1 className="text-3xl">ผลงาน</h1>
                   <ul className="layout-grid-cols-2">
-                    {content.achievements.map((achievements) =>
+                    {content.achievements.map((achievements) => (
                       <li>
                         <Card type="horizontal">
                           <CardHeader title={<p>{achievements}</p>} />
                         </Card>
                       </li>
-                    )}
+                    ))}
                   </ul>
                 </Section>
                 <Section className="container-surface">
                   <h1 className="text-3xl">ติดต่อ</h1>
                   <ul className="layout-grid-cols-2">
-                    {content.contacts.map((contact) =>
+                    {content.contacts.map((contact) => (
                       <li>
                         <Card type="horizontal">
                           <CardHeader title={<p>{contact.name}</p>} />
                         </Card>
                       </li>
-                    )}
+                    ))}
                   </ul>
                 </Section>
               </>
@@ -238,10 +244,25 @@ const Test: NextPage = () => {
   );
 };
 
-export const getStaticProps = async ({ locale }: { locale: string }) => ({
-  props: {
-    ...(await serverSideTranslations(locale, ["common", "details"])),
-  },
-});
+// export const getStaticProps = async ({ locale }: { locale: string }) => ({
+//   props: {
+//     ...(await serverSideTranslations(locale, ["common", "details"])),
+//   },
+// });
 
+export const getServerSideProps: GetServerSideProps = async ({ locale }) => {
+  const partyLists = collection(db, "Party");
+  const shortPartyLists = collection(db, "ShortParty");
+  const Parties = (await getDocs(partyLists)).docs.map((party) => party.data());
+  const shortParties = (await getDocs(shortPartyLists)).docs.map((party) =>
+    party.data()
+  );
+
+  return {
+    props: {
+      Parties,
+      shortParties,
+    },
+  };
+};
 export default Test;
